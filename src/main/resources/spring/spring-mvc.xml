@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
+	   xmlns:mvc="http://www.springframework.org/schema/mvc"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<!-- 配置 springMVC 不拦截的静态资源 -->
+	<!-- 静态资源访问(*: 只处理文件夹下一级; **: 文件夹下多级) (缓存一周) -->
+	<mvc:resources location="/static/images/" mapping="/static/images/**" cache-period="604800"/>
+	<mvc:resources location="/static/js/" mapping="/static/js/**" cache-period="604800"/>
+	<mvc:resources location="/static/css/" mapping="/static/css/**" cache-period="604800"/>
+
+
+
+
+	<!-- 注解驱动,必须加,否则 RequestMapping 失效 -->
+	<mvc:annotation-driven/>
+
+	<!-- controller包扫描 -->
+	<context:component-scan base-package="com.cheung.controller"/>
+
+	<!-- Example: prefix="/WEB-INF/jsp/", suffix=".jsp", viewname="test" -> "/WEB-INF/jsp/test.jsp" -->
+	<!-- 视图解析器 -->
+	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix" value="/WEB-INF/views/"/>
+		<property name="suffix" value=".jsp"/>
+	</bean>
+
+</beans>

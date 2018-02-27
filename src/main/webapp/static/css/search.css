@@ -1,0 +1,103 @@
+/*common start*/
+* {
+	margin: 0; /*解决浏览器兼容问题*/
+}
+
+.center-m9 {
+	width: 90%;
+	margin: 0 auto; /*外边距:上下0,左右auto自动填充*/
+}
+
+.radius {
+	-webkit-border-radius: 6px; /*适配以webkit为核心的浏览器(chrome、safari等)*/
+	-moz-border-radius: 6px; /*适配firefox浏览器*/
+	-ms-border-radius: 6px; /*适配IE浏览器*/
+	-o-border-radius: 6px; /*适配opera浏览器*/
+	border-radius: 5px; /*适配所有浏览器(需要放在最后面，类似于if..else if..else..)*/
+
+	border: 1px solid #DBDBDB;
+	outline: none;
+}
+
+.icon_img {
+	vertical-align: middle;
+}
+
+/*common end*/
+
+/*head start*/
+.head {
+	height: 40px;
+	background: #3385FF;
+	padding-top: 10px;
+}
+
+.head span {
+	font-size: 20px;
+	font-weight: 700;
+	color: #fff;
+}
+
+/*head end*/
+
+/*content start*/
+.content {
+	height: auto;
+	margin-top: 180px;
+}
+
+.content .tools {
+	margin-bottom: 20px;
+}
+
+.content .tools table {
+	position: relative;
+	margin: 0 auto;
+	border: 0px;
+	border-collapse: separate;/*表格边框独立不合并*/
+	border-spacing: 10px;/*单元格间距*/
+
+}
+
+.content .tools #phoneNum {
+	width: 400px;
+	height: 38px;
+}
+
+.content .tools .btn {
+	width: 100px;
+	height: 36px;
+	border: none;
+	background: #E4F2FF;
+	outline: none;
+	cursor: pointer;
+	transition: 0.3s; /*延迟0.3s*/
+	/*float: right;*/
+}
+
+.content .tools .btn:hover {
+	background: #019FFF;
+	color: #fff;
+	transition: 0.1s; /*延迟0.1s*/
+}
+
+.content .detail {
+	width: 883px;
+	height: 496px;
+	background: #DCFFDB;
+}
+
+.content .detail textarea {
+	width: 100%;
+	height: 100%;
+	margin: 0 auto;
+	padding: 20px 20px;
+	font-size: 30px;
+	text-align: center;
+
+	/*display: table-cell;*/
+	/*vertical-align: middle;*/
+
+}
+
+/*content end*/
