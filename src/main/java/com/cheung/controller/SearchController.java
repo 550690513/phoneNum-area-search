@@ -2,6 +2,7 @@ package com.cheung.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.cheung.utils.ExcelUtils;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
@@ -10,7 +11,10 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -27,7 +31,7 @@ import java.util.List;
 @RequestMapping(value = "page/search")
 public class SearchController {
 
-	public static final String URL = "http://www.ip138.com:8080/search.asp?action=mobile&mobile=%s";
+	private static final String URL = "http://www.ip138.com:8080/search.asp?action=mobile&mobile=%s";
 
 	/*public static void main(String[] args) {
 		String url = "C:/Users/Administrator/Desktop/phoneNum2/y1.xls";
@@ -38,9 +42,17 @@ public class SearchController {
 		}
 	}*/
 
+	/**
+	 * 单个号码查询
+	 *
+	 * @param paramJson
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	@RequestMapping(value = "/singleSearch", method = RequestMethod.POST, produces = "application/json; charset=UTF-8")
 	@ResponseBody
-	public String search(@RequestBody String paramJson, HttpServletRequest request, HttpServletResponse response) {
+	public String singleSearch(@RequestBody String paramJson, HttpServletRequest request, HttpServletResponse response) {
 
 		JSONObject parseObj = JSON.parseObject(paramJson);
 		String phoneNum = parseObj.getString("phoneNum");
@@ -68,9 +80,16 @@ public class SearchController {
 	}
 
 
+	/**
+	 * 批量号码查询
+	 *
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	@RequestMapping(value = "/multipleSearch", method = RequestMethod.POST, produces = "application/json; charset=UTF-8")
 	@ResponseBody
-	public String excelImport(HttpServletRequest request, HttpServletResponse response) {
+	public String multipleSearch(HttpServletRequest request, HttpServletResponse response) {
 
 		HashMap<String, Object> map = new HashMap<String, Object>();
 		try {
@@ -106,7 +125,8 @@ public class SearchController {
 						String name = fileItem.getName();// 原文件名
 						System.out.println("接收到文件: " + name);
 						String suffix = name.substring(name.lastIndexOf("."), name.length());// 后缀名
-						String resultName = name.substring(0, name.lastIndexOf(".")) + "-" + new Date().getTime() + suffix;// 保存的文件名
+						// 保存的文件名
+						String resultName = new Date().getTime() + "-" + name.substring(0, name.lastIndexOf(".")) + suffix;
 
 						File resultFile = new File(dirFile, resultName);// 保存
 						fileItem.write(resultFile);// 写
@@ -114,10 +134,12 @@ public class SearchController {
 						map.put("name", name);// 原文件名
 						map.put("resultName", resultName);// 系统保存的文件名
 						map.put("size", fileItem.getSize());// 文件大小
-						map.put("url", dirPath + resultName);// 系统中的文件路径
+						String filePath = dirPath + File.separator + resultName;
+						map.put("filePath", filePath);// 系统中的文件路径
 
 						// 开始执行
-						// ExcelUtils.getAreaByPhoneNum_multiple(resultName);
+						String resultExcelPath = ExcelUtils.getAreaByPhoneNum_multiple(filePath);
+						map.put("resultExcelPath", resultExcelPath);
 					}
 
 				}
