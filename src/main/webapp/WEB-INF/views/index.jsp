@@ -18,9 +18,9 @@
 	<meta name="Description" content="https://github.com/550690513">
 	<title>号码归属地查询</title>
 
-	<link type="text/css" rel="stylesheet" href="../../static/css/search.css">
-	<script type="text/javascript" src="../../static/js/jquery-1.8.0.min.js"></script>
-	<script type="text/javascript" src="../../static/js/search.js"></script>
+	<link type="text/css" rel="stylesheet" href="${prc}/static/css/search.css">
+	<script type="text/javascript" src="${prc}/static/js/jquery-1.6.4.min.js"></script>
+	<script type="text/javascript" src="${prc}/static/js/search.js"></script>
 
 </head>
 <body>
@@ -44,8 +44,10 @@
 					<td>
 						<input id="phoneNum" class="radius" type="text" name="phoneNum" placeholder="请输入手机号码"
 							   onkeyup="areaSearch()">
-						<img id="phoneNum_icon_ok" class="icon_img" src="../../static/images/icon_ok.png" hidden="hidden">
-						<img id="phoneNum_icon_err" class="icon_img" src="../../static/images/icon_err.png" hidden="hidden">
+						<img id="phoneNum_icon_ok" class="icon_img" src="${prc}/static/images/icon_ok.png"
+							 hidden="hidden">
+						<img id="phoneNum_icon_err" class="icon_img" src="${prc}/static/images/icon_err.png"
+							 hidden="hidden">
 					</td>
 				</tr>
 				<tr>
@@ -59,7 +61,12 @@
 				<tr>
 					<td><input id="file" type="file" name="file" style="display: none" onchange="fileUpload()"></td>
 				</tr>
+
+				<input type="button" value="点击下载" onclick="download('F:\\1519727686176-电话归属地查询-ok.xlsx')">
+
+
 				</tbody>
+
 			</table>
 		</form>
 	</div>

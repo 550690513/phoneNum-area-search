@@ -13,8 +13,6 @@
 	<mvc:resources location="/static/css/" mapping="/static/css/**" cache-period="604800"/>
 
 
-
-
 	<!-- 注解驱动,必须加,否则 RequestMapping 失效 -->
 	<mvc:annotation-driven/>
 

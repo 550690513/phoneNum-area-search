@@ -1,5 +1,8 @@
 var phoneNumReg = /^(((13[0-9]{1})|(15[0-9]{1})|(18[0-9]{1}))+\d{8})$/;
 
+/**
+ * 单个号码查询
+ */
 function areaSearch() {
 	var phoneNum = $("#phoneNum").val().trim().toString();
 
@@ -40,14 +43,17 @@ function areaSearch() {
 	})
 }
 
-
+/**
+ * 批量号码查询
+ */
 function excelImport() {
 	$("#file").click();
 }
 
-//文件上传
+/**
+ * 文件上传
+ */
 function fileUpload() {
-
 	$.ajax({
 		url: "search/multipleSearch",
 		type: "POST",
@@ -61,11 +67,47 @@ function fileUpload() {
 		var str = JSON.stringify(res);
 		detail.clear();
 		$(".detail textarea").attr("text-align", "left");
+		// 文本域展示信息
 		detail.writeMultiple(str);
+
+
+		/*var downloadStr = "<a href='" + res.resultExcelPath + "' download='" + res.name.substring(0, res.name.lastIndexOf(".")) + "-ok" + res.name.substring(res.name.lastIndexOf("."), res.name.length) + "'>点击下载</a>";
+		console.log(downloadStr);
+		// 弹出用户下载框
+		$(".searchForm #btn").append(downloadStr);*/
+
+		// 下载文档
+		downloadResultFile(res.resultExcelPath);
+
 	}).fail(function (res) {
 		alert("上传文件失败~")
 	})
 }
+
+/**
+ * 查询完成结果文档下载
+ */
+function downloadResultFile(fileName) {
+	var file = new Object();
+	file.fileName = fileName;
+
+	$.ajax({
+		url: "download/download",
+		type: "POST",
+		async: true,// 异步
+		data: JSON.stringify(file),
+		contentType: "application/json; charset=utf-8",
+		processData: false,// 不需要对数据做处理
+		success: function (data) {
+			alert("下载成功")
+		},
+		error: function (data) {
+			console.log("下载失败")
+		}
+	})
+}
+
+
 
 var detail = {
 
@@ -79,10 +121,15 @@ var detail = {
 
 	writeMultiple: function writeMultiple(data) {
 		var jsonObj = JSON.parse(data);
-		$(".detail textarea").append(jsonObj.name.toString()).append("\r\n");
+
+		for (var key in jsonObj) {
+			$(".detail textarea").append(jsonObj[key].toString()).append("\r\n");
+		}
+
+		/*$(".detail textarea").append(jsonObj.name.toString()).append("\r\n");
 		$(".detail textarea").append(jsonObj.resultName.toString()).append("\r\n");
 		$(".detail textarea").append(jsonObj.size.toString()).append("\r\n");
-		$(".detail textarea").append(jsonObj.url.toString()).append("\r\n");
+		$(".detail textarea").append(jsonObj.url.toString()).append("\r\n");*/
 	},
 
 	writePhoneNumErr: function writePhoneNumErr() {
@@ -104,4 +151,24 @@ var icon = {
 		$("#" + i + "_icon_ok").attr("hidden", "hidden");
 		$("#" + i + "_icon_err").attr("hidden", "hidden");
 	}
+}
+
+
+
+function download(fileName) {
+
+	var form = document.createElement('form');
+	document.body.appendChild(form);
+	form.style.display = "none";
+	form.action = "download/download?fileName="+fileName;
+	form.id = 'excel';
+	form.method = 'post';
+
+	var newElement = document.createElement("input");
+	newElement.setAttribute("type","hidden");
+	newElement.name = "filename";
+	newElement.value = "project";
+	form.appendChild(newElement);
+
+	form.submit();
 }
