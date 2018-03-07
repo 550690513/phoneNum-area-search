@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 /**
@@ -29,7 +30,8 @@ import java.util.List;
  * @date 2018/2/6
  */
 @Controller
-@RequestMapping(value = "page/search")
+@RequestMapping(value = "search")
+// @RequestMapping(value = "page/search")
 public class SearchController {
 
 	private static final String URL = "http://www.ip138.com:8080/search.asp?action=mobile&mobile=%s";
@@ -92,7 +94,7 @@ public class SearchController {
 	@ResponseBody
 	public String multipleSearch(HttpServletRequest request, HttpServletResponse response) {
 
-		HashMap<String, Object> map = new HashMap<String, Object>(7);
+		HashMap<String, Object> map = new LinkedHashMap<String, Object>(7);
 		try {
 			request.setCharacterEncoding("utf-8");
 			response.setContentType("text/html;charset=utf-8");
@@ -125,24 +127,24 @@ public class SearchController {
 						/**
 						 * 解决文件名可能重复,造成文件覆盖的问题
 						 */
-						String name = fileItem.getName();// 原文件名
-						System.out.println("接收到文件: " + name);
-						String suffix = name.substring(name.lastIndexOf("."), name.length());// 后缀名
+						String orignialName = fileItem.getName();// 原文件名
+						System.out.println("接收到文件: " + orignialName);
+						String suffix = orignialName.substring(orignialName.lastIndexOf("."), orignialName.length());// 后缀名
 						// 保存的文件名
-						String resultName = System.currentTimeMillis() + "-" + name.substring(0, name.lastIndexOf(".")) + suffix;
+						String resultName = System.currentTimeMillis() + "-" + orignialName.substring(0, orignialName.lastIndexOf(".")) + suffix;
 
 						File resultFile = new File(dirFile, resultName);// 保存
 						fileItem.write(resultFile);// 写
 
-						map.put("name", name);// 原文件名
-						map.put("resultName", resultName);// 系统保存的文件名
-						map.put("size", fileItem.getSize());// 文件大小
-						String filePath = dirPath + File.separator + resultName;
-						map.put("filePath", filePath);// 系统中的文件路径
+						map.put("orignialName", orignialName);// 原文件名
+						map.put("orignialsize", fileItem.getSize());// 原文件大小
+						// map.put("resultName", resultName);// 系统保存文件名
+						String resultPath = dirPath + File.separator + resultName;// 系统中文件路径
+						// map.put("resultPath", resultPath);
 
 						// 开始执行
-						String resultExcelPath = ExcelUtil.getAreaByPhoneNum_multiple(filePath);
-						map.put("resultExcelPath", resultExcelPath);
+						String resultExcel = ExcelUtil.getAreaByPhoneNum_multiple(resultPath);
+						map.put("resultExcel", resultExcel);
 					}
 
 				}

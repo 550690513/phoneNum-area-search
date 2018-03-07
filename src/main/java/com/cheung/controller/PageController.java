@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
  * @date 2018/2/9
  */
 @Controller
-@RequestMapping(value = "page")
+// @RequestMapping(value = "page")
 public class PageController {
 
 	/**

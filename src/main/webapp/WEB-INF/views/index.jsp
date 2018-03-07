@@ -61,10 +61,6 @@
 				<tr>
 					<td><input id="file" type="file" name="file" style="display: none" onchange="fileUpload()"></td>
 				</tr>
-
-				<input type="button" value="点击下载" onclick="download('F:\\1519727686176-电话归属地查询-ok.xlsx')">
-
-
 				</tbody>
 
 			</table>

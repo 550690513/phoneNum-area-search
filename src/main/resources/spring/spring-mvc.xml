@@ -11,6 +11,7 @@
 	<mvc:resources location="/static/images/" mapping="/static/images/**" cache-period="604800"/>
 	<mvc:resources location="/static/js/" mapping="/static/js/**" cache-period="604800"/>
 	<mvc:resources location="/static/css/" mapping="/static/css/**" cache-period="604800"/>
+	<mvc:resources location="/upload/" mapping="/upload/**" cache-period="604800"/>
 
 
 	<!-- 注解驱动,必须加,否则 RequestMapping 失效 -->

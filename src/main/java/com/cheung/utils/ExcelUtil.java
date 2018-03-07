@@ -107,6 +107,10 @@ public class ExcelUtil {
 								try {
 									Document doc = Jsoup.connect(url).get();
 									Elements els = doc.getElementsByClass("tdc2");
+									if (null == els || els.size() == 0) {
+										System.out.println("请求第三方接口获取数据为null");
+										continue;
+									}
 									String area = els.get(1).text();
 									System.out.println("第" + i + "条：" + phoneNum + "---" + area);
 									if (null == row.getCell(1))
@@ -114,6 +118,7 @@ public class ExcelUtil {
 									row.getCell(1).setCellValue(area);
 								} catch (IOException e) {
 									e.printStackTrace();
+									continue;
 								}
 
 							}
@@ -152,6 +157,10 @@ public class ExcelUtil {
 								try {
 									Document doc = Jsoup.connect(url).get();
 									Elements els = doc.getElementsByClass("tdc2");
+									if (null == els || els.size() == 0) {
+										System.out.println("请求第三方接口返回数据为null");
+										continue;
+									}
 									String area = els.get(1).text();
 									System.out.println("第" + i + "条：" + phoneNum + "---" + area);
 									if (null == row.getCell(1))
@@ -159,6 +168,7 @@ public class ExcelUtil {
 									row.getCell(1).setCellValue(area);
 								} catch (IOException e) {
 									e.printStackTrace();
+									continue;
 								}
 
 							}
@@ -190,13 +200,14 @@ public class ExcelUtil {
 	 */
 	private static String createResultExcel(String filePath, Workbook workbook, String suffix) {
 		try {
-			File f = new File(filePath.substring(0, filePath.lastIndexOf(".")) + "-ok." + suffix);
+			File f = new File(filePath.substring(0, filePath.indexOf("-")) + "-ok." + suffix);
 			f.createNewFile();
 			FileOutputStream fos = new FileOutputStream(f);
 			workbook.write(fos);
 			fos.flush();// 刷新此输出流并强制将所有缓冲的输出字节写出
 			fos.close();
-			return f.getCanonicalPath();
+			// return f.getCanonicalPath();// 返回文件路径
+			return f.getName();// 返回文件名称
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
