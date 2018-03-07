@@ -54,9 +54,8 @@
 	position: relative;
 	margin: 0 auto;
 	border: 0px;
-	border-collapse: separate;/*表格边框独立不合并*/
-	border-spacing: 10px;/*单元格间距*/
-
+	border-collapse: separate; /*表格边框独立不合并*/
+	border-spacing: 10px; /*单元格间距*/
 }
 
 .content .tools #phoneNum {
@@ -101,3 +100,8 @@
 }
 
 /*content end*/
+
+#multipleSearch #template {
+	float: right;
+	padding-top: 10px;
+}

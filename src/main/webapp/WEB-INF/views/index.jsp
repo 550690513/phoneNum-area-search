@@ -39,7 +39,7 @@
 		<form id="searchForm" method="post" enctype="multipart/form-data">
 			<table>
 				<tbody>
-				<tr>
+				<tr id="singleSearch">
 					<td>单个号码查询：</td>
 					<td>
 						<input id="phoneNum" class="radius" type="text" name="phoneNum" placeholder="请输入手机号码"
@@ -50,12 +50,13 @@
 							 hidden="hidden">
 					</td>
 				</tr>
-				<tr>
+				<tr id="multipleSearch">
 					<td>批量号码查询：</td>
 					<td>
 						<input id="btn" class="btn radius" type="button" name="btn" value="+ 上传文件"
 							   onclick="excelImport()">
 						<label id="excelName" hidden="hidden"></label>
+						<a id="template" target="_blank" href="${prc}/upload/template.xlsx">点击下载批量查询模板</a>
 					</td>
 				</tr>
 				<tr>
