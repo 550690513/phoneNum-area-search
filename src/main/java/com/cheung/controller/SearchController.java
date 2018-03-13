@@ -3,6 +3,8 @@ package com.cheung.controller;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.cheung.utils.ExcelUtil;
+import com.cheung.utils.HttpRequestUtil;
+import com.cheung.utils.ParseUtil;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
@@ -10,6 +12,7 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,7 +37,10 @@ import java.util.List;
 // @RequestMapping(value = "page/search")
 public class SearchController {
 
-	private static final String URL = "http://www.ip138.com:8080/search.asp?action=mobile&mobile=%s";
+	@Value("${urlIP138}")
+	private String URL_IP138;
+	@Value("${urlTaoBao}")
+	private String URL_TAOBAO;
 
 	/*public static void main(String[] args) {
 		String url = "C:/Users/Administrator/Desktop/phoneNum2/y1.xls";
@@ -66,10 +72,21 @@ public class SearchController {
 			request.setCharacterEncoding("UTF-8");
 			response.setContentType("text/html; charset=UTF-8");
 
-			String url = String.format(URL, phoneNum);
+			/**
+			 * 方式一:请求ip138接口获取数据(通过解析html获取)
+			 */
+			/*String url = String.format(URL_IP138, phoneNum);
 			Document doc = Jsoup.connect(url).get();
 			Elements els = doc.getElementsByClass("tdc2");
-			String area = els.get(1).text();
+			String area = els.get(1).text();*/
+
+			/**
+			 * 方式二:请求淘宝api获取数据(通过解析json获取)
+			 */
+			String str = HttpRequestUtil.sendGet(URL_TAOBAO, "tel=" + phoneNum);
+			JSONObject obj = ParseUtil.parseTBStr(str);
+			String area = obj.getString("carrier");
+
 			dataObj.put("phoneNum", phoneNum);
 			dataObj.put("area", area);
 			resultObj.put("data", dataObj);
@@ -158,6 +175,8 @@ public class SearchController {
 
 		return JSON.toJSONString(map);
 	}
+
+
 
 
 }

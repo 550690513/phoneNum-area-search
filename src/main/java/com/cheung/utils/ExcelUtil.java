@@ -1,5 +1,6 @@
 package com.cheung.utils;
 
+import com.alibaba.fastjson.JSONObject;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
@@ -12,11 +13,12 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.concurrent.*;
 
@@ -25,7 +27,21 @@ import java.util.concurrent.*;
  * @version 1.0.0
  * @date 2018/2/6
  */
+@Component
 public class ExcelUtil {
+
+	private static String urlIP138;
+	private static String urlTaoBao;
+
+	@Value("${urlIP138}")
+	public void setUrlIP138(String urlIP138) {
+		ExcelUtil.urlIP138 = urlIP138;
+	}
+
+	@Value("${urlTaoBao}")
+	public void setUrlTaoBao(String urlTaoBao) {
+		ExcelUtil.urlTaoBao = urlTaoBao;
+	}
 
 	/**
 	 * Excel文件批量查询归属地并导出
@@ -57,7 +73,7 @@ public class ExcelUtil {
 	/**
 	 * 采用线程的方式,便于对执行过程进行控制
 	 */
-	private static class SearchThread implements Callable<String> {
+	public static class SearchThread implements Callable<String> {
 
 		private String filePath;
 
@@ -97,26 +113,43 @@ public class ExcelUtil {
 								}
 
 								HSSFRow row = sheet.getRow(i);// 当前行(从第2行开始读)
-								if (isBlankRow(row, index, cellCount)) continue;// 非空判断
+								if (isBlankRow(row, index, cellCount)) {
+									continue;// 非空判断
+								}
 
 								HSSFCell phoneNumCell = row.getCell(0);// 第一列(电话号码)
 								phoneNumCell.setCellType(HSSFCell.CELL_TYPE_STRING);
 								String phoneNum = phoneNumCell.getStringCellValue();
-								String url = "http://www.ip138.com:8080/search.asp?action=mobile&mobile=%s";
-								url = String.format(url, phoneNum);
+
+
 								try {
-									Document doc = Jsoup.connect(url).get();
+									/**
+									 * 方式一:请求ip138接口获取数据(通过解析html获取)
+									 */
+									urlIP138 = String.format(urlIP138, phoneNum);
+									Document doc = Jsoup.connect(urlIP138).get();
 									Elements els = doc.getElementsByClass("tdc2");
 									if (null == els || els.size() == 0) {
 										System.out.println("请求第三方接口获取数据为null");
 										continue;
 									}
 									String area = els.get(1).text();
+
+
+									/**
+									 * 方式二:请求淘宝api获取数据(通过解析json获取)
+									 */
+									/*String str = HttpRequestUtil.sendGet(urlTaoBao, "tel=" + phoneNum);
+									JSONObject obj = ParseUtil.parseTBStr(str);
+									String area = obj.getString("carrier");*/
+
+
 									System.out.println("第" + i + "条：" + phoneNum + "---" + area);
-									if (null == row.getCell(1))
+									if (null == row.getCell(1)) {
 										row.createCell(1).setCellType(HSSFCell.CELL_TYPE_STRING);
+									}
 									row.getCell(1).setCellValue(area);
-								} catch (IOException e) {
+								} catch (Exception e) {
 									e.printStackTrace();
 									continue;
 								}
@@ -147,26 +180,41 @@ public class ExcelUtil {
 								}
 
 								XSSFRow row = sheet.getRow(i);// 当前行(从第2行开始读)
-								if (isBlankRow(row, index, cellCount)) continue;// 非空判断
+								if (isBlankRow(row, index, cellCount)) {
+									continue;// 非空判断
+								}
 
 								XSSFCell phoneNumCell = row.getCell(0);// 第一列(电话号码)
 								phoneNumCell.setCellType(HSSFCell.CELL_TYPE_STRING);
 								String phoneNum = phoneNumCell.getStringCellValue();
-								String url = "http://www.ip138.com:8080/search.asp?action=mobile&mobile=%s";
-								url = String.format(url, phoneNum);
+
 								try {
+									/**
+									 * 方式一:请求ip138接口获取数据(通过解析html获取)
+									 */
+									/*String url = String.format(urlIP138, phoneNum);
 									Document doc = Jsoup.connect(url).get();
 									Elements els = doc.getElementsByClass("tdc2");
 									if (null == els || els.size() == 0) {
-										System.out.println("请求第三方接口返回数据为null");
+										System.out.println("请求第三方接口获取数据为null");
 										continue;
 									}
-									String area = els.get(1).text();
+									String area = els.get(1).text();*/
+
+
+									/**
+									 * 方式二:请求淘宝api获取数据(通过解析json获取)
+									 */
+									String str = HttpRequestUtil.sendGet(urlTaoBao, "tel=" + phoneNum);
+									JSONObject obj = ParseUtil.parseTBStr(str);
+									String area = obj.getString("carrier");
+
 									System.out.println("第" + i + "条：" + phoneNum + "---" + area);
-									if (null == row.getCell(1))
+									if (null == row.getCell(1)) {
 										row.createCell(1).setCellType(HSSFCell.CELL_TYPE_STRING);
+									}
 									row.getCell(1).setCellValue(area);
-								} catch (IOException e) {
+								} catch (Exception e) {
 									e.printStackTrace();
 									continue;
 								}
@@ -223,7 +271,9 @@ public class ExcelUtil {
 	 * @return
 	 */
 	private static boolean isBlankRow(HSSFRow row, int index, int cellCount) {
-		if (row == null) return true;
+		if (row == null) {
+			return true;
+		}
 		// 遍历每一列
 		for (int i = index; i < cellCount; i++) {
 			HSSFCell cell = row.getCell(i);
@@ -244,7 +294,9 @@ public class ExcelUtil {
 	 * @return
 	 */
 	private static boolean isBlankRow(XSSFRow row, int index, int cellCount) {
-		if (row == null) return true;
+		if (row == null) {
+			return true;
+		}
 		for (int i = index; i < cellCount; i++) {
 			XSSFCell cell = row.getCell(i);
 			cell.setCellType(XSSFCell.CELL_TYPE_STRING);

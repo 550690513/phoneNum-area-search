@@ -27,4 +27,14 @@
 		<property name="suffix" value=".jsp"/>
 	</bean>
 
+	<!--需要在mvc文件中同时暴露配置文件的位置,否则controller类读取不到-->
+	<bean class="org.springframework.beans.factory.config.PreferencesPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>classpath:phoneNumAreaSearch.properties</value>
+			</list>
+		</property>
+	</bean>
+
+
 </beans>

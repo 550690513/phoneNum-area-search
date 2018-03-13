@@ -34,7 +34,11 @@ function areaSearch() {
 		success: function (result) {
 			icon.ok("phoneNum");
 			detail.clear();
-			detail.writeSingle(result.data.area);
+			if (result.msg == "success") {
+				detail.writeSingle(result.data.area);
+			} else {
+				alert("查询出错,请稍后重试!");
+			}
 		},
 		error: function (data) {
 			icon.hidden("phoneNum");
