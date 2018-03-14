@@ -30,7 +30,10 @@ import java.util.concurrent.*;
 @Component
 public class ExcelUtil {
 
-	private static String urlIP138;
+	private static String urlIP138 = "http://www.ip138.com:8080/search.asp?action=mobile&mobile=%s";
+	private static String urlTaoBao = "https://tcc.taobao.com/cc/json/mobile_tel_segment.htm";
+
+	/*private static String urlIP138;
 	private static String urlTaoBao;
 
 	@Value("${urlIP138}")
@@ -41,7 +44,7 @@ public class ExcelUtil {
 	@Value("${urlTaoBao}")
 	public void setUrlTaoBao(String urlTaoBao) {
 		ExcelUtil.urlTaoBao = urlTaoBao;
-	}
+	}*/
 
 	/**
 	 * Excel文件批量查询归属地并导出
@@ -58,7 +61,7 @@ public class ExcelUtil {
 		}
 		for (Future<String> fs : results) {
 			try {
-				System.out.println(fs.get());
+				System.out.println("批量查询完成，结果文件：" + fs.get());
 				return fs.get();
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -120,14 +123,15 @@ public class ExcelUtil {
 								HSSFCell phoneNumCell = row.getCell(0);// 第一列(电话号码)
 								phoneNumCell.setCellType(HSSFCell.CELL_TYPE_STRING);
 								String phoneNum = phoneNumCell.getStringCellValue();
+								System.out.println(phoneNum);
 
 
 								try {
 									/**
 									 * 方式一:请求ip138接口获取数据(通过解析html获取)
 									 */
-									urlIP138 = String.format(urlIP138, phoneNum);
-									Document doc = Jsoup.connect(urlIP138).get();
+									String url = String.format(urlIP138, phoneNum);
+									Document doc = Jsoup.connect(url).get();
 									Elements els = doc.getElementsByClass("tdc2");
 									if (null == els || els.size() == 0) {
 										System.out.println("请求第三方接口获取数据为null");
@@ -192,22 +196,22 @@ public class ExcelUtil {
 									/**
 									 * 方式一:请求ip138接口获取数据(通过解析html获取)
 									 */
-									/*String url = String.format(urlIP138, phoneNum);
+									String url = String.format(urlIP138, phoneNum);
 									Document doc = Jsoup.connect(url).get();
 									Elements els = doc.getElementsByClass("tdc2");
 									if (null == els || els.size() == 0) {
 										System.out.println("请求第三方接口获取数据为null");
 										continue;
 									}
-									String area = els.get(1).text();*/
+									String area = els.get(1).text();
 
 
 									/**
 									 * 方式二:请求淘宝api获取数据(通过解析json获取)
 									 */
-									String str = HttpRequestUtil.sendGet(urlTaoBao, "tel=" + phoneNum);
+									/*String str = HttpRequestUtil.sendGet(urlTaoBao, "tel=" + phoneNum);
 									JSONObject obj = ParseUtil.parseTBStr(str);
-									String area = obj.getString("carrier");
+									String area = obj.getString("carrier");*/
 
 									System.out.println("第" + i + "条：" + phoneNum + "---" + area);
 									if (null == row.getCell(1)) {
@@ -248,7 +252,13 @@ public class ExcelUtil {
 	 */
 	private static String createResultExcel(String filePath, Workbook workbook, String suffix) {
 		try {
-			File f = new File(filePath.substring(0, filePath.indexOf("-")) + "-ok." + suffix);
+			File f = null;
+			if (!filePath.contains("-")) {
+				// 通过main方法直接批量查询
+				f = new File(filePath.substring(0, filePath.lastIndexOf("/") + 1) + filePath.substring(filePath.lastIndexOf("/") + 1, filePath.lastIndexOf(".")) + "-ok." + suffix);
+			} else {
+				f = new File(filePath.substring(0, filePath.indexOf("-")) + "-ok." + suffix);
+			}
 			f.createNewFile();
 			FileOutputStream fos = new FileOutputStream(f);
 			workbook.write(fos);

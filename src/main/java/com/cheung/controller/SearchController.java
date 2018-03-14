@@ -42,14 +42,15 @@ public class SearchController {
 	@Value("${urlTaoBao}")
 	private String URL_TAOBAO;
 
-	/*public static void main(String[] args) {
-		String url = "C:/Users/Administrator/Desktop/phoneNum2/y1.xls";
+	public static void main(String[] args) {
+		// String url = "C:/Users/Administrator/Desktop/批量查询模板.xlsx";
+		String url = "C:/Users/Administrator/Desktop/新增用户.xls";
 		try {
 			ExcelUtil.getAreaByPhoneNum_multiple(url);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	}*/
+	}
 
 	/**
 	 * 单个号码查询
@@ -75,17 +76,17 @@ public class SearchController {
 			/**
 			 * 方式一:请求ip138接口获取数据(通过解析html获取)
 			 */
-			/*String url = String.format(URL_IP138, phoneNum);
+			String url = String.format(URL_IP138, phoneNum);
 			Document doc = Jsoup.connect(url).get();
 			Elements els = doc.getElementsByClass("tdc2");
-			String area = els.get(1).text();*/
+			String area = els.get(1).text();
 
 			/**
 			 * 方式二:请求淘宝api获取数据(通过解析json获取)
 			 */
-			String str = HttpRequestUtil.sendGet(URL_TAOBAO, "tel=" + phoneNum);
+			/*String str = HttpRequestUtil.sendGet(URL_TAOBAO, "tel=" + phoneNum);
 			JSONObject obj = ParseUtil.parseTBStr(str);
-			String area = obj.getString("carrier");
+			String area = obj.getString("carrier");*/
 
 			dataObj.put("phoneNum", phoneNum);
 			dataObj.put("area", area);
