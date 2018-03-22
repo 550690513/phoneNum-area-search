@@ -3,8 +3,6 @@ package com.cheung.controller;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.cheung.utils.ExcelUtil;
-import com.cheung.utils.HttpRequestUtil;
-import com.cheung.utils.ParseUtil;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
@@ -22,10 +20,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author Cheung
@@ -44,9 +39,17 @@ public class SearchController {
 
 	public static void main(String[] args) {
 		// String url = "C:/Users/Administrator/Desktop/批量查询模板.xlsx";
-		String url = "C:/Users/Administrator/Desktop/归属地/归属地1.xls";
+		ArrayList<String> list = new ArrayList<String>();
+		// list.add("C:/Users/Administrator/Desktop/归属地/归属地1.xls");
+		list.add("C:/Users/Administrator/Desktop/归属地/归属地2.xls");
+		list.add("C:/Users/Administrator/Desktop/归属地/归属地3.xls");
+		list.add("C:/Users/Administrator/Desktop/归属地/归属地4.xls");
+		list.add("C:/Users/Administrator/Desktop/归属地/归属地5.xls");
+		list.add("C:/Users/Administrator/Desktop/归属地/归属地6.xls");
 		try {
-			ExcelUtil.getAreaByPhoneNum_multiple(url);
+			for (int i = 0; i < list.size(); i++) {
+				ExcelUtil.getAreaByPhoneNum_multiple(list.get(i));
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
