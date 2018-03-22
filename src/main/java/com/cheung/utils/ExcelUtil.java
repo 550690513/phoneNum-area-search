@@ -123,8 +123,6 @@ public class ExcelUtil {
 								HSSFCell phoneNumCell = row.getCell(0);// 第一列(电话号码)
 								phoneNumCell.setCellType(HSSFCell.CELL_TYPE_STRING);
 								String phoneNum = phoneNumCell.getStringCellValue();
-								System.out.println(phoneNum);
-
 
 								try {
 									/**

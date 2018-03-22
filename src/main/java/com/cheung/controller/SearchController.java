@@ -44,7 +44,7 @@ public class SearchController {
 
 	public static void main(String[] args) {
 		// String url = "C:/Users/Administrator/Desktop/批量查询模板.xlsx";
-		String url = "C:/Users/Administrator/Desktop/新增用户.xls";
+		String url = "C:/Users/Administrator/Desktop/归属地/归属地1.xls";
 		try {
 			ExcelUtil.getAreaByPhoneNum_multiple(url);
 		} catch (Exception e) {
