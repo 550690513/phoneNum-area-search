@@ -40,7 +40,7 @@ public class SearchController {
 	public static void main(String[] args) {
 		// String url = "C:/Users/Administrator/Desktop/批量查询模板.xlsx";
 		ArrayList<String> list = new ArrayList<String>();
-		// list.add("C:/Users/Administrator/Desktop/归属地/归属地1.xls");
+		list.add("C:/Users/Administrator/Desktop/归属地/归属地1.xls");
 		list.add("C:/Users/Administrator/Desktop/归属地/归属地2.xls");
 		list.add("C:/Users/Administrator/Desktop/归属地/归属地3.xls");
 		list.add("C:/Users/Administrator/Desktop/归属地/归属地4.xls");
