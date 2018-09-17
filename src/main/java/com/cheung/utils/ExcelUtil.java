@@ -52,7 +52,7 @@ public class ExcelUtil {
 	 * @param filePath 文件路径
 	 */
 	public static String getAreaByPhoneNum_multiple(String filePath) {
-
+		/*
 		// 创建线程池
 		ExecutorService exec = Executors.newCachedThreadPool();
 		ArrayList<Future<String>> results = new ArrayList<Future<String>>();
@@ -69,8 +69,37 @@ public class ExcelUtil {
 				exec.shutdown();
 			}
 		}
-		return null;
+		return null;*/
 
+		// 创建一个可缓存线程池，如果线程池长度超过处理需要，可灵活回收空闲线程，若无可回收，则新建线程。
+		ExecutorService exec = Executors.newCachedThreadPool();
+		// 所要执行的线程任务
+		SearchThread task = new SearchThread(filePath);
+		// 执行
+		Future<String> future = exec.submit(task);
+
+		try {
+			System.out.println("批量查询完成，结果文件：" + future.get());
+			return future.get();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			// 启动一次顺序关闭，执行以前提交的任务，但不接受新任务。
+			// 一定要调用这个方法，不然executorService.isTerminated()永远不为true
+			exec.shutdown();
+			while (true) {//等待所有任务都结束了继续执行
+				try {
+					if (exec.isTerminated()) {
+						System.out.println("所有的子线程都结束了！");
+						break;
+					}
+					Thread.sleep(1000);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return null;
 	}
 
 	/**
@@ -218,7 +247,6 @@ public class ExcelUtil {
 									row.getCell(1).setCellValue(area);
 								} catch (Exception e) {
 									e.printStackTrace();
-									continue;
 								}
 
 							}
@@ -255,7 +283,7 @@ public class ExcelUtil {
 				// 通过main方法直接批量查询
 				f = new File(filePath.substring(0, filePath.lastIndexOf("/") + 1) + filePath.substring(filePath.lastIndexOf("/") + 1, filePath.lastIndexOf(".")) + "-ok." + suffix);
 			} else {
-				f = new File(filePath.substring(0, filePath.indexOf("-")) + "-ok." + suffix);
+				f = new File(filePath.substring(0, filePath.lastIndexOf("-")) + "-ok." + suffix);
 			}
 			f.createNewFile();
 			FileOutputStream fos = new FileOutputStream(f);
