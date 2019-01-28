@@ -16,6 +16,8 @@
 	<meta name="Author" content="Cheung">
 	<meta name="Keywords" content="号码归属地查询">
 	<meta name="Description" content="https://github.com/550690513">
+	<link rel="icon" href="${prc}/static/images/favicon.ico">
+
 	<title>号码归属地查询</title>
 
 	<link type="text/css" rel="stylesheet" href="${prc}/static/css/search.css">
@@ -43,18 +45,18 @@
 					<td>单个号码查询：</td>
 					<td>
 						<input id="phoneNum" class="radius" type="text" name="phoneNum" placeholder="请输入手机号码"
-							   onkeyup="areaSearch()">
+						       onkeyup="areaSearch()">
 						<img id="phoneNum_icon_ok" class="icon_img" src="${prc}/static/images/icon_ok.png"
-							 hidden="hidden">
+						     hidden="hidden">
 						<img id="phoneNum_icon_err" class="icon_img" src="${prc}/static/images/icon_err.png"
-							 hidden="hidden">
+						     hidden="hidden">
 					</td>
 				</tr>
 				<tr id="multipleSearch">
 					<td>批量号码查询：</td>
 					<td>
 						<input id="btn" class="btn radius" type="button" name="btn" value="+ 上传文件"
-							   onclick="excelImport()">
+						       onclick="excelImport()">
 						<label id="excelName" hidden="hidden"></label>
 						<a id="template" target="_blank" href="${prc}/upload/template.xlsx">点击下载批量查询模板</a>
 					</td>

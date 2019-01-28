@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee"
-		 xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
-		 id="MyWebApp" version="2.5">
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+         id="MyWebApp" version="2.5">
 	<display-name>phoneNumAreaSearch</display-name>
 
 	<!-- spring配置文件 -->
@@ -43,9 +43,8 @@
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>springServlet</servlet-name>
-		<!-- 配置为默认servlet -->
-		<url-pattern>/</url-pattern>
-
+		<!-- mvcServlet仅处理*.do请求 -->
+		<url-pattern>*.do</url-pattern>
 
 		<!--
 			servlet的四种url匹配规则
@@ -68,9 +67,8 @@
 
 	</servlet-mapping>
 
-
 	<welcome-file-list>
-		<welcome-file>index.jsp</welcome-file>
+		<welcome-file>index.do</welcome-file>
 	</welcome-file-list>
 
 </web-app>

@@ -2,20 +2,18 @@ package com.cheung.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.cheung.model.SearchModel;
+import com.cheung.service.SearchService;
 import com.cheung.utils.ExcelUtil;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.select.Elements;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -23,78 +21,89 @@ import java.io.File;
 import java.util.*;
 
 /**
+ * 查询 controller
+ *
  * @author Cheung
- * @version 1.0.0
+ * @version 1.0.2
  * @date 2018/2/6
  */
-@Controller
-@RequestMapping(value = "search")
-// @RequestMapping(value = "page/search")
+@RestController
+@RequestMapping("search")
 public class SearchController {
 
-	@Value("${urlIP138}")
-	private String URL_IP138;
-	@Value("${urlTaoBao}")
-	private String URL_TAOBAO;
+	@Autowired
+	private SearchService searchService;
+
 
 	/**
-	 * 单个号码查询
+	 * 单个查询
 	 *
-	 * @param paramJson
+	 * @param phoneNum
 	 * @param request
 	 * @param response
 	 * @return
 	 */
-	@RequestMapping(value = "/singleSearch", method = RequestMethod.POST, produces = "application/json; charset=UTF-8")
-	@ResponseBody
-	public String singleSearch(@RequestBody String paramJson, HttpServletRequest request, HttpServletResponse response) {
+	@RequestMapping(value = "/singleSearch", method = RequestMethod.GET, produces = "application/json; charset=UTF-8")
+	public String singleSearch(@RequestParam(value = "phoneNum", required = true) String phoneNum,
+	                           HttpServletRequest request,
+	                           HttpServletResponse response) {
 
-		JSONObject parseObj = JSON.parseObject(paramJson);
-		String phoneNum = parseObj.getString("phoneNum");
-
-		JSONObject resultObj = new JSONObject();
-		JSONObject dataObj = new JSONObject();
+		JSONObject resObj = new JSONObject();
 		try {
 			request.setCharacterEncoding("UTF-8");
 			response.setContentType("text/html; charset=UTF-8");
 
-			/**
-			 * 方式一:请求ip138接口获取数据(通过解析html获取)
-			 */
-			String url = String.format(URL_IP138, phoneNum);
-			Document doc = Jsoup.connect(url).get();
-			Elements els = doc.getElementsByClass("tdc2");
-			String area = els.get(1).text();
+			// 查询
+			SearchModel searchModel = searchService.singleSearch(phoneNum);
 
-			/**
-			 * 方式二:请求淘宝api获取数据(通过解析json获取)
-			 */
-			/*String str = HttpRequestUtil.sendGet(URL_TAOBAO, "tel=" + phoneNum);
-			JSONObject obj = ParseUtil.parseTBStr(str);
-			String area = obj.getString("carrier");*/
-
-			dataObj.put("phoneNum", phoneNum);
-			dataObj.put("area", area);
-			resultObj.put("data", dataObj);
-			resultObj.put("code", "200");
-			resultObj.put("msg", "success");
+			resObj.put("data", searchModel);
+			resObj.put("code", "200");
+			resObj.put("msg", "success");
 		} catch (Exception e) {
-			resultObj.put("msg", "fail");
+			resObj.put("msg", "fail");
 			e.printStackTrace();
 		}
-		return resultObj.toJSONString();
+		return resObj.toJSONString();
 	}
 
-
 	/**
-	 * 批量号码查询
+	 * 批量查询
 	 *
 	 * @param request
 	 * @param response
 	 * @return
 	 */
+	@RequestMapping(value = "/batchSearch", method = RequestMethod.POST, produces = "application/json; charset=UTF-8")
+	public String batchSearch(HttpServletRequest request, HttpServletResponse response) {
+		HashMap<String, Object> resMap = new LinkedHashMap<String, Object>(7);
+		try {
+			request.setCharacterEncoding("utf-8");
+			response.setContentType("text/html;charset=utf-8");
+
+			// 初始化file
+			String filePath = ExcelUtil.init(request);
+			// 获取数据
+			Map<Integer, Map<Integer, String>> fileData = ExcelUtil.getFileData(filePath);
+			// 查询
+			Map<Integer, Map<Integer, SearchModel>> searchData = searchService.batchSearch(fileData);
+			// 反写数据到结果文件
+			String resFile = ExcelUtil.writeData(filePath, searchData);
+			resMap.put("resFile", resFile);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return JSON.toJSONString(resMap);
+	}
+
+	/**
+	 * 批量查询
+	 *
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	@Deprecated
 	@RequestMapping(value = "/multipleSearch", method = RequestMethod.POST, produces = "application/json; charset=UTF-8")
-	@ResponseBody
 	public String multipleSearch(HttpServletRequest request, HttpServletResponse response) {
 
 		HashMap<String, Object> map = new LinkedHashMap<String, Object>(7);
@@ -127,27 +136,27 @@ public class SearchController {
 						continue;
 					} else {
 						// 文件上传表单域提交
-						/**
+
+						/*
 						 * 解决文件名可能重复,造成文件覆盖的问题
 						 */
-						String orignialName = fileItem.getName();// 原文件名
-						System.out.println("接收到文件: " + orignialName);
-						String suffix = orignialName.substring(orignialName.lastIndexOf("."), orignialName.length());// 后缀名
+						String oriFile = fileItem.getName();// 原文件名
+						System.out.println("接收到文件: " + oriFile);
+						String suffix = oriFile.substring(oriFile.lastIndexOf("."), oriFile.length());// 后缀名
 						// 保存的文件名
-						String resultName = System.currentTimeMillis() + "-" + orignialName.substring(0, orignialName.lastIndexOf(".")) + suffix;
+						String resName = System.currentTimeMillis() + "-" + oriFile.substring(0, oriFile.lastIndexOf(".")) + suffix;
 
-						File resultFile = new File(dirFile, resultName);// 保存
-						fileItem.write(resultFile);// 写
+						File file = new File(dirFile, resName);// 保存
+						fileItem.write(file);// 写
 
-						map.put("orignialName", orignialName);// 原文件名
-						map.put("orignialsize", fileItem.getSize());// 原文件大小
-						// map.put("resultName", resultName);// 系统保存文件名
-						String resultPath = dirPath + File.separator + resultName;// 系统中文件路径
-						// map.put("resultPath", resultPath);
+						String resPath = dirPath + File.separator + resName;// 保存的文件的路径
 
-						// 开始执行
-						String resultExcel = ExcelUtil.getAreaByPhoneNum_multiple(resultPath);
-						map.put("resultExcel", resultExcel);
+						// 批量查询
+						String resFile = ExcelUtil.multipleSearch(resPath);
+
+						map.put("oriFile", oriFile);
+						map.put("oriSize", fileItem.getSize());
+						map.put("resFile", resFile);
 					}
 
 				}
@@ -160,30 +169,6 @@ public class SearchController {
 		System.out.println(JSON.toJSONString(map));
 
 		return JSON.toJSONString(map);
-	}
-
-
-	/**
-	 * 本地批量导出测试
-	 *
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		// String url = "C:/Users/Administrator/Desktop/批量查询模板.xlsx";
-		ArrayList<String> list = new ArrayList<String>();
-		list.add("C:/Users/Administrator/Desktop/归属地/归属地1.xls");
-		list.add("C:/Users/Administrator/Desktop/归属地/归属地2.xls");
-		list.add("C:/Users/Administrator/Desktop/归属地/归属地3.xls");
-		list.add("C:/Users/Administrator/Desktop/归属地/归属地4.xls");
-		list.add("C:/Users/Administrator/Desktop/归属地/归属地5.xls");
-		list.add("C:/Users/Administrator/Desktop/归属地/归属地6.xls");
-		try {
-			for (int i = 0; i < list.size(); i++) {
-				ExcelUtil.getAreaByPhoneNum_multiple(list.get(i));
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 	}
 
 }
